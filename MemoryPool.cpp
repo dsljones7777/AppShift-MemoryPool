@@ -19,7 +19,9 @@
  */
 
 #include "MemoryPool.h"
-#include <iostream>
+#include "limited_functionality/iostream.h"
+#include "limited_functionality/memory.h"
+#include <cstring>
 
 AppShift::Memory::MemoryPool::MemoryPool(size_t block_size)
 {

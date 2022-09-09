@@ -18,12 +18,9 @@
  * @author Sapir Shemer
  */
 #pragma once
+#ifndef MEMORYPOOL_DEFAULT_BLOCK_SIZE
 #define MEMORYPOOL_DEFAULT_BLOCK_SIZE 1024 * 1024
-
-#include <stdlib.h>
-#include <cstring>
-#include <cstddef>
-#include <memory>
+#endif
 
 namespace AppShift::Memory {
 	// Simple error collection for memory pool
