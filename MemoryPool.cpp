@@ -23,6 +23,14 @@
 #include "limited_functionality/memory.h"
 #include <cstring>
 
+AppShift::Memory::MemoryPool::MemoryPool()
+{
+	// Add first block to memory pool
+	this->firstBlock = this->currentBlock = nullptr;
+	this->defaultBlockSize = 0;
+	this->currentScope = nullptr;
+}
+
 AppShift::Memory::MemoryPool::MemoryPool(size_t block_size)
 {
 	// Add first block to memory pool
@@ -37,7 +45,7 @@ AppShift::Memory::MemoryPool::~MemoryPool() {
 
     while (block_iterator != nullptr) {
         SMemoryBlockHeader* next_iterator = block_iterator->next;
-        std::free(block_iterator);
+        std::free(block_iterator,block_iterator->blockSize + sizeof(SMemoryBlockHeader));
         block_iterator = next_iterator;
     }
 }
@@ -46,7 +54,7 @@ void AppShift::Memory::MemoryPool::createMemoryBlock(size_t block_size)
 {
 	// Create the block
 	SMemoryBlockHeader* block = reinterpret_cast<SMemoryBlockHeader*>(std::malloc(sizeof(SMemoryBlockHeader) + block_size));
-	if (block == NULL) throw EMemoryErrors::CANNOT_CREATE_BLOCK;
+	//DLJ: made so malloc -> alloc_block never fails
 
 	// Initalize block data
 	block->blockSize = block_size;
@@ -105,12 +113,12 @@ void* AppShift::Memory::MemoryPool::reallocate(void* unit_pointer_start, size_t 
 	// Allocate new and free previous
 	void* temp_point = this->allocate(new_size);
 	std::memcpy(temp_point, unit_pointer_start, unit->length);
-	this->free(unit_pointer_start);
+	this->free_ptr(unit_pointer_start);
 
 	return temp_point;
 }
 
-void AppShift::Memory::MemoryPool::free(void* unit_pointer_start)
+void AppShift::Memory::MemoryPool::free_ptr(void* unit_pointer_start)
 {
 	if (unit_pointer_start == nullptr) return;
 
@@ -133,7 +141,7 @@ void AppShift::Memory::MemoryPool::free(void* unit_pointer_start)
 			block->prev->next = block->next;
 			block->next->prev = block->prev;
 		}
-		std::free(block);
+		std::free(block, block->blockSize + sizeof(SMemoryBlockHeader));
 	}
 }
 
@@ -198,7 +206,7 @@ void AppShift::Memory::MemoryPool::endScope()
 	// Free all blocks until the start of scope
 	while (this->currentBlock != this->currentScope->firstScopeBlock) {
 		this->currentBlock = this->currentBlock->prev;
-		std::free(this->currentBlock->next);
+		std::free(this->currentBlock->next, this->currentBlock->next->blockSize + sizeof(SMemoryBlockHeader));
 		this->currentBlock->next = nullptr;
 	}
 

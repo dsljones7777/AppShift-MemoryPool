@@ -67,7 +67,8 @@ namespace AppShift::Memory {
 		 * 
 		 * @param size_t block_size Defines the default size of a block in the pool, by default uses MEMORYPOOL_DEFAULT_BLOCK_SIZE
 		 */
-		MemoryPool(size_t block_size = MEMORYPOOL_DEFAULT_BLOCK_SIZE);
+		MemoryPool();
+		MemoryPool(size_t block_size);
 		// Destructor
 		~MemoryPool();
 
@@ -121,7 +122,7 @@ namespace AppShift::Memory {
 		 *
 		 * @param void* unit_pointer_start Pointer to the object to free
 		 */
-		void free(void* unit_pointer_start);
+		void free_ptr(void* unit_pointer_start);
 
 		/**
 		 * Dump memory pool meta data of blocks unit to stream. 
