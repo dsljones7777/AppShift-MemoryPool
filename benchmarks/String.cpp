@@ -30,7 +30,7 @@ namespace AppShift {
 		this->start[this->length] = '\0';
 	}
 
-	String::~String() { this->mp->free(this->start); }
+	String::~String() { this->mp->pvmos_free(this->start); }
 
 	char* String::data() const { return this->start; }
 
@@ -38,7 +38,7 @@ namespace AppShift {
 
 	String& String::operator=(const char* str)
 	{
-		this->mp->free(this->start);
+		this->mp->pvmos_free(this->start);
 		this->length = strlen(str);
 		this->start = new (this->mp) char[this->length + 1];
 		memcpy(this->start, str, this->length);
@@ -48,7 +48,7 @@ namespace AppShift {
 
 	String& String::operator=(const String& str)
 	{
-		this->mp->free(this->start);
+		this->mp->pvmos_free(this->start);
 		this->length = str.size();
 		this->start = new (this->mp) char[this->length + 1];
 		memcpy(this->start, str.data(), this->length);

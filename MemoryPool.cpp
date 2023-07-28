@@ -45,7 +45,7 @@ AppShift::Memory::MemoryPool::~MemoryPool() {
 
     while (block_iterator != nullptr) {
         SMemoryBlockHeader* next_iterator = block_iterator->next;
-        std::free(block_iterator,block_iterator->blockSize + sizeof(SMemoryBlockHeader));
+        std::pvmos_free(block_iterator,block_iterator->blockSize + sizeof(SMemoryBlockHeader));
         block_iterator = next_iterator;
     }
 }
@@ -53,7 +53,7 @@ AppShift::Memory::MemoryPool::~MemoryPool() {
 void AppShift::Memory::MemoryPool::createMemoryBlock(size_t block_size)
 {
 	// Create the block
-	SMemoryBlockHeader* block = reinterpret_cast<SMemoryBlockHeader*>(std::malloc(sizeof(SMemoryBlockHeader) + block_size));
+	SMemoryBlockHeader* block = reinterpret_cast<SMemoryBlockHeader*>(std::pvmos_malloc(sizeof(SMemoryBlockHeader) + block_size));
 	//DLJ: made so malloc -> alloc_block never fails
 
 	// Initalize block data
@@ -141,7 +141,7 @@ void AppShift::Memory::MemoryPool::free_ptr(void* unit_pointer_start)
 			block->prev->next = block->next;
 			block->next->prev = block->prev;
 		}
-		std::free(block, block->blockSize + sizeof(SMemoryBlockHeader));
+		std::pvmos_free(block, block->blockSize + sizeof(SMemoryBlockHeader));
 	}
 }
 
@@ -206,7 +206,7 @@ void AppShift::Memory::MemoryPool::endScope()
 	// Free all blocks until the start of scope
 	while (this->currentBlock != this->currentScope->firstScopeBlock) {
 		this->currentBlock = this->currentBlock->prev;
-		std::free(this->currentBlock->next, this->currentBlock->next->blockSize + sizeof(SMemoryBlockHeader));
+		std::pvmos_free(this->currentBlock->next, this->currentBlock->next->blockSize + sizeof(SMemoryBlockHeader));
 		this->currentBlock->next = nullptr;
 	}
 
